@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 
 // @ts-expect-error - typo-js doesn't have TypeScript definitions
@@ -15,6 +15,7 @@ function App() {
   const [subject, setSubject] = useState('')
   const [spellChecker, setSpellChecker] = useState<SpellChecker | null>(null)
   const [spellCheckResults, setSpellCheckResults] = useState<string[]>([])
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     const checker = new Typo('en_US')
@@ -27,7 +28,27 @@ function App() {
       return
     }
 
-    const words = emailContent.toLowerCase().match(/\b[a-zA-Z]+\b/g) || []
+    const textarea = textareaRef.current
+    if (!textarea) {
+      alert('Unable to access text area.')
+      return
+    }
+
+    const selectionStart = textarea.selectionStart
+    const selectionEnd = textarea.selectionEnd
+    
+    let textToCheck = ''
+    let isSelectedText = false
+
+    if (selectionStart !== selectionEnd) {
+      textToCheck = emailContent.substring(selectionStart, selectionEnd)
+      isSelectedText = true
+    } else {
+      alert('Please select the text you want to spell check, or select all text (Ctrl+A) to check the entire email.')
+      return
+    }
+
+    const words = textToCheck.toLowerCase().match(/\b[a-zA-Z]+\b/g) || []
     const misspelledWords: string[] = []
 
     words.forEach(word => {
@@ -41,9 +62,9 @@ function App() {
     setSpellCheckResults(misspelledWords)
 
     if (misspelledWords.length === 0) {
-      alert('No spelling errors found!')
+      alert(`No spelling errors found in the ${isSelectedText ? 'selected text' : 'text'}!`)
     } else {
-      alert(`Found ${misspelledWords.length} potential spelling errors: ${misspelledWords.join(', ')}`)
+      alert(`Found ${misspelledWords.length} potential spelling errors in selected text: ${misspelledWords.join(', ')}`)
     }
   }
 
@@ -75,6 +96,7 @@ function App() {
           <label htmlFor="content">Email Content:</label>
           <textarea
             id="content"
+            ref={textareaRef}
             value={emailContent}
             onChange={(e) => setEmailContent(e.target.value)}
             placeholder="Compose your email here..."
