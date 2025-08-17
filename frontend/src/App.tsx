@@ -1,13 +1,44 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
+
+// @ts-ignore
+import Typo from 'typo-js'
 
 function App() {
   const [emailContent, setEmailContent] = useState('')
   const [subject, setSubject] = useState('')
+  const [spellChecker, setSpellChecker] = useState<any>(null)
+  const [spellCheckResults, setSpellCheckResults] = useState<string[]>([])
+
+  useEffect(() => {
+    const checker = new Typo('en_US')
+    setSpellChecker(checker)
+  }, [])
 
   const handleSpellCheck = async () => {
-    // TODO: Implement spell check functionality
-    console.log('Spell check requested')
+    if (!spellChecker || !emailContent.trim()) {
+      alert('Please enter some email content to check spelling.')
+      return
+    }
+
+    const words = emailContent.toLowerCase().match(/\b[a-zA-Z]+\b/g) || []
+    const misspelledWords: string[] = []
+
+    words.forEach(word => {
+      if (!spellChecker.check(word)) {
+        if (!misspelledWords.includes(word)) {
+          misspelledWords.push(word)
+        }
+      }
+    })
+
+    setSpellCheckResults(misspelledWords)
+
+    if (misspelledWords.length === 0) {
+      alert('No spelling errors found!')
+    } else {
+      alert(`Found ${misspelledWords.length} potential spelling errors: ${misspelledWords.join(', ')}`)
+    }
   }
 
   const handleGrammarCheck = async () => {
@@ -43,6 +74,11 @@ function App() {
             placeholder="Compose your email here..."
             rows={10}
           />
+          {spellCheckResults.length > 0 && (
+            <div className="spell-check-results" style={{marginTop: '10px', padding: '10px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '4px'}}>
+              <p><strong>Potential spelling errors found:</strong> {spellCheckResults.join(', ')}</p>
+            </div>
+          )}
         </div>
         
         <div className="button-group">
