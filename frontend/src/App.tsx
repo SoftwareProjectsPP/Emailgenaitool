@@ -15,6 +15,7 @@ function App() {
   const [subject, setSubject] = useState('')
   const [spellChecker, setSpellChecker] = useState<SpellChecker | null>(null)
   const [spellCheckResults, setSpellCheckResults] = useState<string[]>([])
+  const [validationMessage, setValidationMessage] = useState<string>('')
   // eslint-disable-next-line no-undef
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -24,14 +25,17 @@ function App() {
   }, [])
 
   const handleSpellCheck = async () => {
+    setValidationMessage('')
+    setSpellCheckResults([])
+    
     if (!spellChecker || !emailContent.trim()) {
-      alert('Please enter some email content to check spelling.')
+      setValidationMessage('Please enter some email content to check spelling.')
       return
     }
 
     const textarea = textareaRef.current
     if (!textarea) {
-      alert('Unable to access text area.')
+      setValidationMessage('Unable to access text area.')
       return
     }
 
@@ -45,7 +49,7 @@ function App() {
       textToCheck = emailContent.substring(selectionStart, selectionEnd)
       isSelectedText = true
     } else {
-      alert('Please select the text you want to spell check, or select all text (Ctrl+A) to check the entire email.')
+      setValidationMessage('Please select the text you want to spell check, or select all text (Ctrl+A) to check the entire email.')
       return
     }
 
@@ -63,9 +67,7 @@ function App() {
     setSpellCheckResults(misspelledWords)
 
     if (misspelledWords.length === 0) {
-      alert(`No spelling errors found in the ${isSelectedText ? 'selected text' : 'text'}!`)
-    } else {
-      alert(`Found ${misspelledWords.length} potential spelling errors in selected text: ${misspelledWords.join(', ')}`)
+      setValidationMessage(`No spelling errors found in the ${isSelectedText ? 'selected text' : 'text'}!`)
     }
   }
 
@@ -103,6 +105,11 @@ function App() {
             placeholder="Compose your email here..."
             rows={10}
           />
+          {validationMessage && (
+            <div className="validation-message" style={{marginTop: '10px', padding: '10px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', color: '#721c24'}}>
+              <p><strong>{validationMessage}</strong></p>
+            </div>
+          )}
           {spellCheckResults.length > 0 && (
             <div className="spell-check-results" style={{marginTop: '10px', padding: '10px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '4px'}}>
               <p><strong>Potential spelling errors found:</strong> {spellCheckResults.join(', ')}</p>
