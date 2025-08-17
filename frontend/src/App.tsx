@@ -15,6 +15,7 @@ function App() {
   const [subject, setSubject] = useState('')
   const [spellChecker, setSpellChecker] = useState<SpellChecker | null>(null)
   const [spellCheckResults, setSpellCheckResults] = useState<string[]>([])
+  // eslint-disable-next-line no-undef
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
