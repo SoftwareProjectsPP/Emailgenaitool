@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-// @ts-ignore
+// @ts-expect-error - typo-js doesn't have TypeScript definitions
 import Typo from 'typo-js'
+
+declare const alert: (message: string) => void
+
+interface SpellChecker {
+  check: (word: string) => boolean
+}
 
 function App() {
   const [emailContent, setEmailContent] = useState('')
   const [subject, setSubject] = useState('')
-  const [spellChecker, setSpellChecker] = useState<any>(null)
+  const [spellChecker, setSpellChecker] = useState<SpellChecker | null>(null)
   const [spellCheckResults, setSpellCheckResults] = useState<string[]>([])
 
   useEffect(() => {
