@@ -1,2 +1,5 @@
 # Emailgenaitool
 Email tool with gen AI prompts
+
+## Test Update
+This is a simple test change to verify PR creation functionality.
