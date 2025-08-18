@@ -129,33 +129,36 @@ function App() {
           />
         </div>
         
-        <div className="form-group">
-          <label htmlFor="content">Email Content:</label>
-          <textarea
-            id="content"
-            ref={textareaRef}
-            value={emailContent}
-            onChange={(e) => setEmailContent(e.target.value)}
-            placeholder="Compose your email here..."
-            rows={10}
-          />
-          {validationMessage && (
-            <div className="validation-message" style={{marginTop: '10px', padding: '10px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', color: '#721c24'}}>
-              <p><strong>{validationMessage}</strong></p>
-            </div>
-          )}
+        <div className="textarea-container">
+          <div className="form-group">
+            <label htmlFor="content">Email Content:</label>
+            <textarea
+              id="content"
+              ref={textareaRef}
+              value={emailContent}
+              onChange={(e) => setEmailContent(e.target.value)}
+              placeholder="Compose your email here..."
+              rows={10}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="result">Result:</label>
+            <textarea
+              id="result"
+              value={resultText}
+              placeholder="Spell check results will appear here..."
+              rows={10}
+              readOnly
+            />
+          </div>
         </div>
         
-        <div className="form-group">
-          <label htmlFor="result">Result:</label>
-          <textarea
-            id="result"
-            value={resultText}
-            placeholder="Spell check results will appear here..."
-            rows={4}
-            readOnly
-          />
-        </div>
+        {validationMessage && (
+          <div className="validation-message" style={{marginTop: '10px', padding: '10px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', color: '#721c24'}}>
+            <p><strong>{validationMessage}</strong></p>
+          </div>
+        )}
         
         <div className="button-group">
           <button 
