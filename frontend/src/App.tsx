@@ -15,6 +15,7 @@ function App() {
   const [validationMessage, setValidationMessage] = useState<string>('')
   const [isLoadingDictionary, setIsLoadingDictionary] = useState<boolean>(true)
   const [resultText, setResultText] = useState<string>('')
+  const [isLoadingGrammar, setIsLoadingGrammar] = useState<boolean>(false)
   // eslint-disable-next-line no-undef
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -106,8 +107,64 @@ function App() {
   }
 
   const handleGrammarCheck = async () => {
-    // TODO: Implement grammar check functionality
-    console.log('Grammar check requested')
+    setValidationMessage('')
+    setResultText('')
+    
+    if (!emailContent.trim()) {
+      setValidationMessage('Please enter some email content to check grammar.')
+      return
+    }
+
+    const textarea = textareaRef.current
+    if (!textarea) {
+      setValidationMessage('Unable to access text area.')
+      return
+    }
+
+    const selectionStart = textarea.selectionStart
+    const selectionEnd = textarea.selectionEnd
+    
+    let textToCheck = ''
+    let isSelectedText = false
+
+    if (selectionStart !== selectionEnd) {
+      textToCheck = emailContent.substring(selectionStart, selectionEnd)
+      isSelectedText = true
+    } else {
+      setValidationMessage('Please select the text you want to check grammar for, or select all text (Ctrl+A) to check the entire email.')
+      return
+    }
+
+    try {
+      setIsLoadingGrammar(true)
+      setResultText('🔄 Checking grammar...')
+      
+      const response = await fetch('/api/grammar-check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: textToCheck }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      
+      if (result.hasChanges) {
+        setResultText(`✅ Grammar corrected:\n\n${result.correctedText}`)
+      } else {
+        setResultText(`✅ No grammar issues found in the ${isSelectedText ? 'selected text' : 'text'}!`)
+      }
+    } catch (error) {
+      console.error('Grammar check error:', error)
+      setResultText('❌ Grammar check failed. Please try again.')
+      setValidationMessage('Failed to check grammar. Please ensure the backend is running and try again.')
+    } finally {
+      setIsLoadingGrammar(false)
+    }
   }
 
   return (
@@ -165,8 +222,12 @@ function App() {
           >
             {isLoadingDictionary ? 'Loading Dictionary...' : 'Check Spelling'}
           </button>
-          <button onClick={handleGrammarCheck} className="btn btn-secondary">
-            Fix Grammar
+          <button 
+            onClick={handleGrammarCheck} 
+            className="btn btn-secondary"
+            disabled={isLoadingGrammar}
+          >
+            {isLoadingGrammar ? 'Checking Grammar...' : 'Fix Grammar'}
           </button>
         </div>
       </main>
