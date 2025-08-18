@@ -61,6 +61,25 @@
   min-height: 200px;
 }
 
+.textarea-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.textarea-container .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.textarea-container .form-group:first-child {
+  margin-right: 0;
+}
+
+.textarea-container .form-group:last-child {
+  margin-left: 0;
+}
+
 .button-group {
   display: flex;
   gap: 15px;
