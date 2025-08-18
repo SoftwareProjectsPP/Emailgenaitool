@@ -12,9 +12,9 @@ function App() {
   const [emailContent, setEmailContent] = useState('')
   const [subject, setSubject] = useState('')
   const [spellChecker, setSpellChecker] = useState<SpellChecker | null>(null)
-  const [spellCheckResults, setSpellCheckResults] = useState<string[]>([])
   const [validationMessage, setValidationMessage] = useState<string>('')
   const [isLoadingDictionary, setIsLoadingDictionary] = useState<boolean>(true)
+  const [resultText, setResultText] = useState<string>('')
   // eslint-disable-next-line no-undef
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -53,7 +53,7 @@ function App() {
 
   const handleSpellCheck = async () => {
     setValidationMessage('')
-    setSpellCheckResults([])
+    setResultText('')
     
     if (isLoadingDictionary) {
       setValidationMessage('Dictionary is still loading. Please wait a moment and try again.')
@@ -96,10 +96,12 @@ function App() {
       }
     })
 
-    setSpellCheckResults(misspelledWords)
-
     if (misspelledWords.length === 0) {
-      setValidationMessage(`No spelling errors found in the ${isSelectedText ? 'selected text' : 'text'}!`)
+      setResultText(`✅ No spelling errors found in the ${isSelectedText ? 'selected text' : 'text'}!`)
+      setValidationMessage('')
+    } else {
+      setResultText(`⚠️ Potential spelling errors found: ${misspelledWords.join(', ')}`)
+      setValidationMessage('')
     }
   }
 
@@ -142,11 +144,17 @@ function App() {
               <p><strong>{validationMessage}</strong></p>
             </div>
           )}
-          {spellCheckResults.length > 0 && (
-            <div className="spell-check-results" style={{marginTop: '10px', padding: '10px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '4px'}}>
-              <p><strong>Potential spelling errors found:</strong> {spellCheckResults.join(', ')}</p>
-            </div>
-          )}
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="result">Result:</label>
+          <textarea
+            id="result"
+            value={resultText}
+            placeholder="Spell check results will appear here..."
+            rows={4}
+            readOnly
+          />
         </div>
         
         <div className="button-group">
